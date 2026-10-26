@@ -1,4 +1,4 @@
-const Group = require('../models/group');
+const Group = require('../models/Group');
 
 // POST /groups
 async function createGroup(req, res) {
