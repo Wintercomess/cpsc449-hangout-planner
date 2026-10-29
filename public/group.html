@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Group · Hangout Planner</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="groups.html">Hangout <span>Planner</span></a>
+    <div class="nav-user">
+      <span id="nav-user-name"></span>
+      <a class="btn btn-sm" href="index.html">Sign out</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <p class="small"><a href="groups.html">← All groups</a></p>
+
+    <div class="page-header">
+      <div>
+        <h1 id="group-name"></h1>
+        <p class="muted" id="group-desc"></p>
+      </div>
+      <div class="card" style="padding:12px 16px;text-align:center">
+        <div class="muted small">Invite code</div>
+        <div class="invite-code" id="group-code"></div>
+        <button class="btn-link small" id="copy-code">Copy</button>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab active" data-tab="hangouts">Hangouts</button>
+      <button class="tab" data-tab="tasks">Tasks</button>
+      <button class="tab" data-tab="expenses">Expenses</button>
+      <button class="tab" data-tab="members">Members</button>
+    </div>
+
+    <!-- Hangouts: vote on dates/times and places -->
+    <section class="tab-panel" id="hangouts">
+      <div class="card-header">
+        <h2>Hangouts</h2>
+        <button class="btn btn-primary btn-sm organizer-only" onclick="openModal('hangout-modal')">+ New hangout</button>
+      </div>
+      <div class="stack" id="hangout-list"></div>
+    </section>
+
+    <!-- Tasks: who drives, who brings food -->
+    <section class="tab-panel" id="tasks" hidden>
+      <div class="card">
+        <div class="card-header">
+          <h2>Tasks</h2>
+          <span class="muted small" id="task-hint"></span>
+        </div>
+        <ul class="list" id="task-list"></ul>
+        <form class="form-row" id="task-form" style="margin-top:12px">
+          <input id="task-title" placeholder="Add a task, e.g. Bring drinks" required>
+          <button class="btn btn-primary">Add</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Expenses: split costs -->
+    <section class="tab-panel" id="expenses" hidden>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><h2>Expenses</h2></div>
+          <ul class="list" id="expense-list"></ul>
+          <form id="expense-form" style="margin-top:16px">
+            <div class="form-row">
+              <input id="expense-desc" placeholder="What was it for?" required>
+              <input id="expense-amount" type="number" min="0.01" step="0.01" placeholder="Amount" style="max-width:110px" required>
+            </div>
+            <div class="form-row" style="margin-top:8px">
+              <select id="expense-payer"></select>
+              <button class="btn btn-primary">Add</button>
+            </div>
+            <p class="muted small" style="margin:6px 0 0">Split evenly between all members.</p>
+          </form>
+        </div>
+        <div class="card">
+          <div class="card-header"><h2>Balances</h2></div>
+          <ul class="list" id="balance-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Members and their roles in this group -->
+    <section class="tab-panel" id="members" hidden>
+      <div class="card">
+        <div class="card-header">
+          <h2>Members</h2>
+          <span class="muted small" id="member-count"></span>
+        </div>
+        <ul class="list" id="member-list"></ul>
+      </div>
+    </section>
+  </main>
+
+  <!-- New hangout (organizers and owners) -->
+  <div class="modal-backdrop" id="hangout-modal" hidden>
+    <form class="card modal" id="hangout-form">
+      <div class="card-header">
+        <h2>New hangout</h2>
+        <button type="button" class="btn-link" data-close="hangout-modal">✕</button>
+      </div>
+      <div class="field">
+        <label for="hangout-title">Title</label>
+        <input id="hangout-title" placeholder="e.g. Movie night" required>
+      </div>
+      <div class="field">
+        <label for="hangout-dates">Date / time options <span class="muted">(one per line)</span></label>
+        <textarea id="hangout-dates" rows="3" placeholder="Fri, Nov 14 · 7:00 PM&#10;Sat, Nov 15 · 3:00 PM" required></textarea>
+      </div>
+      <div class="field">
+        <label for="hangout-places">Place options <span class="muted">(one per line)</span></label>
+        <textarea id="hangout-places" rows="3" placeholder="AMC Fullerton 20&#10;Someone's apartment" required></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:16px">Start voting</button>
+    </form>
+  </div>
+
+  <script src="js/mock-data.js"></script>
+  <script src="js/common.js"></script>
+  <script src="js/group.js"></script>
+</body>
+</html>

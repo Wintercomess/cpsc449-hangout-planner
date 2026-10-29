@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My groups · Hangout Planner</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <nav class="navbar">
+    <a class="brand" href="groups.html">Hangout <span>Planner</span></a>
+    <div class="nav-user">
+      <span id="nav-user-name"></span>
+      <a class="btn btn-sm" href="index.html">Sign out</a>
+    </div>
+  </nav>
+
+  <main class="container">
+    <div class="page-header">
+      <div>
+        <h1>My groups</h1>
+        <p class="muted">Pick a group to see its hangouts, tasks and expenses.</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn" onclick="openModal('join-modal')">Join with code</button>
+        <button class="btn btn-primary" onclick="openModal('create-modal')">+ New group</button>
+      </div>
+    </div>
+
+    <div class="grid" id="group-list"></div>
+  </main>
+
+  <!-- Create group -->
+  <div class="modal-backdrop" id="create-modal" hidden>
+    <form class="card modal" id="create-form">
+      <div class="card-header">
+        <h2>Create a group</h2>
+        <button type="button" class="btn-link" data-close="create-modal">✕</button>
+      </div>
+      <div class="field">
+        <label for="group-name">Group name</label>
+        <input id="group-name" maxlength="100" placeholder="e.g. Friday Night Crew" required>
+      </div>
+      <div class="field">
+        <label for="group-desc">Description <span class="muted">(optional)</span></label>
+        <textarea id="group-desc" rows="3" maxlength="500" placeholder="What's this group for?"></textarea>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:16px">Create group</button>
+    </form>
+  </div>
+
+  <!-- Join group -->
+  <div class="modal-backdrop" id="join-modal" hidden>
+    <form class="card modal" id="join-form">
+      <div class="card-header">
+        <h2>Join a group</h2>
+        <button type="button" class="btn-link" data-close="join-modal">✕</button>
+      </div>
+      <p class="muted small">Ask a friend for their group's 8-character invite code.</p>
+      <div class="field">
+        <label for="invite-code">Invite code</label>
+        <input id="invite-code" class="invite-code" maxlength="8" placeholder="4F9A1C2B" required>
+      </div>
+      <button class="btn btn-primary btn-block" style="margin-top:16px">Join</button>
+    </form>
+  </div>
+
+  <script src="js/mock-data.js"></script>
+  <script src="js/common.js"></script>
+  <script>
+    const me = MOCK.currentUser._id;
+
+    function renderGroups() {
+      const list = document.getElementById('group-list');
+      list.innerHTML = MOCK.groups
+        .map((g) => {
+          const myRole = g.members.find((m) => m.user === me).role;
+          const open = g.hangouts.filter((h) => h.status === 'voting').length;
+          return `
+            <a class="card" href="group.html?id=${g._id}">
+              <div class="card-header">
+                <h2>${escapeHtml(g.name)}</h2>
+                ${roleBadge(myRole)}
+              </div>
+              <p class="muted small">${escapeHtml(g.description || 'No description')}</p>
+              <p class="small" style="margin-bottom:0">
+                ${g.members.length} members · ${open} open vote${open === 1 ? '' : 's'}
+              </p>
+            </a>`;
+        })
+        .join('');
+    }
+
+    // Mockup only: adds to the in-memory list, nothing is saved
+    document.getElementById('create-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      MOCK.groups.push({
+        _id: 'g' + Date.now(),
+        name: document.getElementById('group-name').value,
+        description: document.getElementById('group-desc').value,
+        inviteCode: 'NEW00000',
+        members: [{ user: me, role: 'owner' }],
+        hangouts: [],
+        tasks: [],
+        expenses: [],
+      });
+      e.target.reset();
+      closeModal('create-modal');
+      renderGroups();
+      showToast('Group created (mock — not saved)');
+    });
+
+    document.getElementById('join-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      e.target.reset();
+      closeModal('join-modal');
+      showToast('Join request sent (mock)');
+    });
+
+    renderGroups();
+  </script>
+</body>
+</html>
