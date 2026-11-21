@@ -7,12 +7,13 @@ const router = express.Router();
 router.use('/health', healthRoutes);
 
 const groupRoutes = require('./group.routes');
-
 router.use('/groups', groupRoutes);
 
 const locationRoutes = require('./location.routes');
-
 router.use('/location', locationRoutes);
+
+const itineraryRoutes =  require('./itinerary.routes')
+router.use('/itineraries', itineraryRoutes);
 
 // Add new route files here, e.g.:
 // router.use('/groups', require('./group.routes'));
