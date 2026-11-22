@@ -52,7 +52,16 @@ src/
     User.js          account (name, email, bcrypt passwordHash, googleId)
     Group.js         group + members with per-group role and invite code
   middleware/        404 + central error handler (auth / role checks go here later)
+public/              UI mockup (plain HTML/CSS/JS, served at http://localhost:3000/)
+  index.html         sign in / create account
+  groups.html        my groups, create group, join with invite code
+  group.html         one group: hangout voting, tasks, expenses, members
+  js/mock-data.js    fake data the pages use instead of the API (for now)
 ```
+
+### UI mockup
+
+The pages in `public/` use fake data from `public/js/mock-data.js` and are **not connected to the API yet**. Changes you make in the UI only live in memory and reset on refresh. View them with `npm run dev` and open `http://localhost:3000/`, or just open `public/index.html` directly in a browser (no server or database needed).
 
 ### Adding a new endpoint
 
