@@ -21,6 +21,9 @@ router.use('/location', locationRoutes);
 const itineraryRoutes =  require('./itinerary.routes')
 router.use('/itineraries', itineraryRoutes);
 
+const guideRoutes = require('./guide.routes');
+router.use('/guides', guideRoutes);
+
 // Add new route files here, e.g.:
 // router.use('/groups', require('./group.routes'));
 

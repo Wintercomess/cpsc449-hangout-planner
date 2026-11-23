@@ -48,6 +48,8 @@ src/
   routes/            URL -> controller mapping (all mounted under /api)
   controllers/       request handlers: read req, call models/services, send res
   services/          business logic shared between controllers (e.g. cost splitting)
+    itinerary.service.js   Gemini itinerary generation
+    wikivoyage.service.js  Wikivoyage destination guides (summary + places)
   models/            Mongoose schemas
     User.js          account (name, email, bcrypt passwordHash, googleId)
     Group.js         group + members with per-group role and invite code
@@ -70,6 +72,55 @@ The pages in `public/` use fake data from `public/js/mock-data.js` and are **not
 3. Mount the route file in `src/routes/index.js`, e.g. `router.use('/groups', require('./group.routes'))`
 
 Express 5 forwards errors thrown in `async` handlers to the error handler automatically, so there is no need for try/catch in every controller. Mongoose validation errors become `400`, bad ids become `400`, and duplicate keys become `409`.
+
+## External APIs
+
+| API | Used for | Key needed |
+|---|---|---|
+| LocationIQ | `GET /api/location/search?q=` geocoding | `LOCATIONIQ_API_KEY` |
+| Gemini | `POST /api/itineraries/groups/:groupId` itinerary generation | `GEMINI_API_KEY` |
+| Wikivoyage | `GET /api/guides` destination guides | none |
+
+### Wikivoyage destination guides
+
+`GET /api/guides/search?q=fullerton&limit=5` lists matching Wikivoyage articles (`title`, `snippet`, `url`).
+
+`GET /api/guides?destination=Fullerton&types=see,do,eat,drink&limit=5` returns one destination guide:
+
+```json
+{
+  "title": "Fullerton",
+  "url": "https://en.wikivoyage.org/wiki/Fullerton",
+  "summary": "Fullerton is an inland city in north Orange County...",
+  "image": "https://thumb.wikimedia.org/...",
+  "listings": {
+    "see": [
+      {
+        "name": "Fullerton Arboretum",
+        "description": "A collection of 4,000 plants from around the world on 26 acres...",
+        "address": "1900 Associated Rd",
+        "directions": "Yorba Linda exit off the 57 freeway",
+        "hours": "8AM-4:30PM (extended hours in summer months)",
+        "price": "Free - suggested $3 donation",
+        "phone": "+1 714 278-3407",
+        "url": "http://fullertonarboretum.org/",
+        "coordinates": { "lat": 33.8872, "lng": -117.8828 }
+      }
+    ],
+    "do": [], "eat": [], "drink": []
+  },
+  "guideSummary": "Wikivoyage guide for Fullerton: ...\nSee: Fullerton Arboretum, ...",
+  "source": "Wikivoyage (CC BY-SA 4.0)"
+}
+```
+
+- `types` (optional): any of `see, do, buy, eat, drink, sleep`. Default `see,do,eat,drink`.
+- `limit` (optional): max places per type, 1-25, default 5.
+- Destination names are matched with Wikivoyage search, so `los angeles` and `new york` work (disambiguation pages are skipped). Unknown places return `404`.
+- Big cities such as Los Angeles and New York City put their places in district articles, so the main page can come back with empty `listings`. The summary is still returned.
+- Responses are cached in memory for an hour.
+
+The itinerary endpoint uses this automatically. If the request body has no `guideSummary`, it looks the destination up on Wikivoyage and passes the guide notes to Gemini. A failed lookup doesn't block the itinerary.
 
 ## Roles
 
