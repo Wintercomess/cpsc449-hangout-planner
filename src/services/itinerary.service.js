@@ -47,7 +47,7 @@ Destination Guide Notes: ${guideSummary || 'None'}
         temperature: 0.7,
       },
     }),
-    signal: AbortSignal.timeout(15000),
+    signal: AbortSignal.timeout(60000),
   });
 
   if (!response.ok) {

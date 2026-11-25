@@ -1,19 +1,33 @@
 const express = require('express');
 const router = express.Router();
 const groupcontroller = require('../controllers/groupcontroller');
+const votingController = require('../controllers/voting.controller');
+const taskController = require('../controllers/task.controller');
+const expenseController = require('../controllers/expense.controller');
 
-// router.post('/', groupcontroller.createGroup);
-// router.get('/:id', groupcontroller.getGroupById);
+// Group CRUD
+router.post('/', groupcontroller.createGroup);
+router.get('/', groupcontroller.getAllGroups);
+router.get('/:id', groupcontroller.getGroupById);
+router.patch('/:id', groupcontroller.updateGroup);
+router.delete('/:id', groupcontroller.deleteGroup);
 
-router.get('/', (req, res) => {
-  // Temporarily bypassing the database for Postman testing
-  res.status(200).json({
-    success: true,
-    message: "Groups retrieved successfully",
-    groups: [
-      { id: 1, name: "LA Hacks Team", location: "Los Angeles" }
-    ]
-  });
-});
+// Voting
+router.post('/:id/ideas', votingController.createIdea);
+router.get('/:id/ideas', votingController.getIdeas);
+router.post('/:id/vote', votingController.castVote);
+router.post('/:id/finalize', votingController.finalizePlan);
+
+// Tasks
+router.post('/:id/tasks', taskController.createTask);
+router.get('/:id/tasks', taskController.getTasks);
+router.patch('/:id/tasks/:taskId', taskController.updateTask);
+router.delete('/:id/tasks/:taskId', taskController.deleteTask);
+
+// Expenses
+router.post('/:id/expenses', expenseController.createExpense);
+router.get('/:id/expenses', expenseController.getExpenses);
+router.patch('/:id/expenses/:expenseId', expenseController.updateExpense);
+router.delete('/:id/expenses/:expenseId', expenseController.deleteExpense);
 
 module.exports = router;
